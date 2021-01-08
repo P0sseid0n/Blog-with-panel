@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+</head>
+<body>
+    <%- include('../../partials/navbar-admin.ejs')  %> 
+
+    <div class="container">
+        <a href="/admin/categories/new" class="btn btn-success mt-2 float-end">Create a new category</a>
+        <table class="table table-xl align-middle">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Slug</th>
+                <th scope="col">Name</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% categories.forEach(category => { %>
+                    <tr class="align-middle">
+                        <th scope="row"><%= category.id  %></th>
+                        <td><%= category.slug  %></td>
+                        <td ><%= category.name  %></td>
+                        <td>
+                            <a href="/admin/categories/edit/<%= category.id  %>" class="btn btn-warning mb-2">Edit</a>
+                            <form action="/admin/categories/delete" method="post" style="display: inline;" onsubmit="confirmDelection(event, this)">
+                                <input type="hidden" name="id" value="<%= category.id  %>">
+                                <button class="btn btn-danger mb-2">Delete</button>
+                            </form>
+                        </td>
+                    </tr>     
+                <% }) %>
+            </tbody>
+          </table>
+    </div>
+</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+    <script>
+        const confirmDelection = (event, form) => {
+            event.preventDefault()
+
+            if(confirm('Are you sure ?')) form.submit()
+        }
+    </script>
+</html>

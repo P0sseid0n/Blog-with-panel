@@ -1,0 +1,15 @@
+<nav class="navbar navbar-dark bg-success mb-3 navbar-expand-lg">
+    <div class="container" style="font-weight: bold;">
+        <ul class="navbar-nav">
+            <li class="nav-item me-3" style="font-size: 22px;">
+                <a class="nav-link" href="/">HOME</a>
+            </li>
+            <% categories.forEach(category => { %>
+                <li class="nav-item pt-2">
+                    <a class="nav-link" href="/category/<%= category.slug %>"><%= category.name %></a>
+                </li>
+    
+            <% }) %>
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,12 @@
+<% articles.forEach(article => { %>
+    <div class="card m-2" style="width: 22rem; display: inline-block;">
+        <div class="card-body">
+            <p style="margin-bottom: .5rem;">
+                <h4 class="ms-3" class="card-title"><%= article.title  %></h4>
+                <span class="badge bg-success"><%= article.category.name  %></span>
+            </p>
+            <a href="/article/<%= article.slug  %>" class="btn btn-outline-success">Read article</a>
+        </div>
+    </div>
+       
+<% }) %>
