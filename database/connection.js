@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 
-const connetion = new Sequelize('blog', 'root', 'mpm0110', {
+const connetion = new Sequelize('blog', 'root', 'PASSWORD', {
     host: 'localhost',
     dialect: 'mysql',
     logging: false,

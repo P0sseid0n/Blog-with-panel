@@ -5,8 +5,6 @@ const app = express()
 
 const session = require('express-session')
 
-const categoriesCtllr = require('./categories/controller')
-const articlesCtllr = require('./articles/controller')
 const adminCtllr = require('./admin/controller')
 
 const categoriesModel = require('./categories/model')
@@ -17,7 +15,7 @@ const connection = require('./database/connection')
 
 app.set('view engine', 'ejs')
 
-app.use(session({ secret: 'secret', cookie: { maxAge: 30_000 } }))
+app.use(session({ secret: 'secret', cookie: { maxAge: 3_000_000 } }))
 
 app.use(express.static('public'))
 
@@ -53,7 +51,6 @@ app.get('/category/:slug', async (req, res) => {
         where: { slug: req.params.slug }, 
         include: [{ model: articlesModel }]
     })
-    console.log(await category.articles.length)
 
     if(!category) return res.redirect('/')
     
@@ -62,9 +59,7 @@ app.get('/category/:slug', async (req, res) => {
     res.render('view-categories', { category, categories })
 })
 
-app.use('/categories', categoriesCtllr)
-app.use('/articles', articlesCtllr)
 app.use('/admin', adminCtllr)
 
 
-app.listen(3000, () => console.log('OK'))
+app.listen(3000, () => console.log('Online'))

@@ -7,21 +7,55 @@ const Category = require('../categories/model')
 const Article = require('../articles/model')
 const Admin = require('../admin/model')
 
-router.get('/', async (req, res) => {
-    res.render('admin/admin')
+const adminAuth = (req, res, next) => {
+    if(req.session.logged) next()
+    else res.redirect('/admin/login')
+}
+
+
+router.get('/login', async (req, res) => {
+    const categories = await Category.findAll()
+    res.render('admin/login', { categories })
 })
 
-router.get('/list', async (req, res) => {
+router.get('/logout', async (req, res) => {
+    req.session.logged = undefined
+    res.redirect('/')
+})
+
+router.post('/login', async (req, res) => {
+    if(req.session.logged) return res.redirect('/admin')
+
+    const { username, password } = req.body
+
+    const admin = await Admin.findOne({ where: { username } })
+
+    if(!admin || !bcrypt.compareSync(password, admin.password)) return res.redirect('/')
+
+    req.session.logged = {
+        id: admin.id,
+        user: admin.username
+    }
+
+    res.redirect('/admin')
+})
+
+router.get('/', adminAuth, async (req, res) => {
+
+    res.render('admin/admin', { admin: req.session.logged })
+})
+
+router.get('/list', adminAuth, async (req, res) => {
     const admins = await Admin.findAll()
 
     res.render('admin/list', { admins })
 })
 
-router.get('/add', async (req, res) => {
+router.get('/add', adminAuth, async (req, res) => {
     res.render('admin/add')
 })
 
-router.post('/add', async (req, res) => {
+router.post('/add', adminAuth, async (req, res) => {
     const { username, password } = req.body
 
     const salt = bcrypt.genSaltSync(10)
@@ -32,7 +66,7 @@ router.post('/add', async (req, res) => {
     res.redirect('/admin/list')
 })
 
-router.post('/remove', async (req, res) => {
+router.post('/remove', adminAuth, async (req, res) => {
     const { id } = req.body
 
     await Admin.destroy({ where: { id }  })
@@ -41,16 +75,16 @@ router.post('/remove', async (req, res) => {
 })
 
 
-router.get('/categories', async (req, res) => {
+router.get('/categories', adminAuth, async (req, res) => {
     const categories = await Category.findAll({ raw: true })
     res.render('admin/categories/categories', { categories })
 })
 
-router.get('/categories/new', (req, res) => {
+router.get('/categories/new', adminAuth, (req, res) => {
     res.render('admin/categories/new-category')
 })
 
-router.post('/categories/save', async (req, res) => {
+router.post('/categories/save', adminAuth, async (req, res) => {
     const name = req.body.category
     if(!name) return res.redirect(req.header('Referer'))
 
@@ -59,13 +93,13 @@ router.post('/categories/save', async (req, res) => {
     res.redirect('/admin/categories')
 })
 
-router.get('/categories/edit/:id', async (req, res) => {
+router.get('/categories/edit/:id', adminAuth, async (req, res) => {
     const category = await Category.findByPk(req.params.id, { raw: true })
     if(!category || isNaN(req.params.id)) return res.redirect('/admin/categories')
     res.render('admin/categories/edit-category', { category })
 })
 
-router.post('/categories/edit/update', async (req, res) => {
+router.post('/categories/edit/update', adminAuth, async (req, res) => {
     const id = req.body.id
     const name = req.body.name
     if(isNaN(id) || !name) return res.redirect('/admin/categories')
@@ -75,7 +109,7 @@ router.post('/categories/edit/update', async (req, res) => {
     res.redirect('/admin/categories')
 })
 
-router.post('/categories/delete', async (req, res) => {
+router.post('/categories/delete', adminAuth, async (req, res) => {
     const id = req.body.id
     if(!id || isNaN(id)) return res.redirect(req.header('Referer'))
 
@@ -91,7 +125,7 @@ router.get('/articles', async (req, res) => {
     res.redirect('/admin/articles/page/0')
 })
 
-router.get('/articles/page/:page', async (req, res) => {
+router.get('/articles/page/:page', adminAuth, async (req, res) => {
     const articlesByPage = 4
 
     let page
@@ -120,12 +154,12 @@ router.get('/articles/page/:page', async (req, res) => {
     res.render('admin/articles/articles', { articles , page: { current: page, last: value } })
 })
 
-router.get('/articles/new', async (req, res) => {
+router.get('/articles/new', adminAuth, async (req, res) => {
     const categories = await Category.findAll( { raw: true } )
     res.render('admin/articles/new-article', { categories })
 })
 
-router.post('/articles/save', async (req, res) => {
+router.post('/articles/save', adminAuth, async (req, res) => {
     const { title, categoryId, body } = req.body
     
     if(!title || !categoryId || !body) return res.redirect(req.header('Referer'))
@@ -135,7 +169,7 @@ router.post('/articles/save', async (req, res) => {
     res.redirect('/admin/articles')
 })
 
-router.get('/articles/edit/:id', async (req, res) => {
+router.get('/articles/edit/:id', adminAuth, async (req, res) => {
     const id = req.params.id
     if(!id || isNaN(id)) return res.redirect(req.header('Referer'))
 
@@ -144,7 +178,7 @@ router.get('/articles/edit/:id', async (req, res) => {
     res.render('admin/articles/edit-article', { article })
 })
 
-router.post('/articles/edit/update', async (req, res) => {
+router.post('/articles/edit/update', adminAuth, async (req, res) => {
     const { id, title, body } = req.body
     if(!id || !title || !body) return res.redirect(req.header('Referer'))
 
@@ -154,7 +188,7 @@ router.post('/articles/edit/update', async (req, res) => {
 })
 
 
-router.post('/articles/delete', async (req, res) => {
+router.post('/articles/delete', adminAuth, async (req, res) => {
     const id = req.body.id
     if(!id || isNaN(id)) return res.redirect(req.header('Referer'))
 
