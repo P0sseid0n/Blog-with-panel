@@ -9,9 +9,9 @@ const adminCtllr = require('./admin/controller')
 
 const categoriesModel = require('./categories/model')
 const articlesModel = require('./articles/model')
+const adminModel = require('./admin/model')
 
 const connection = require('./database/connection')
-const { raw } = require('body-parser')
 
 app.set('view engine', 'ejs')
 

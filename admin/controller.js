@@ -4,10 +4,38 @@ const slugify = require('slugify')
 
 const Category = require('../categories/model')
 const Article = require('../articles/model')
+const Admin = require('../admin/model')
 
 router.get('/', async (req, res) => {
     res.render('admin/admin')
 })
+
+router.get('/list', async (req, res) => {
+    const admins = await Admin.findAll()
+
+    res.render('admin/list', { admins })
+})
+
+router.get('/add', async (req, res) => {
+    res.render('admin/add')
+})
+
+router.post('/add', async (req, res) => {
+    const { username, password } = req.body
+
+    await Admin.create({ username, password  })
+
+    res.redirect('/admin/list')
+})
+
+router.post('/remove', async (req, res) => {
+    const { id } = req.body
+
+    await Admin.destroy({ where: { id }  })
+
+    res.redirect('/admin/list')
+})
+
 
 router.get('/categories', async (req, res) => {
     const categories = await Category.findAll({ raw: true })
@@ -47,14 +75,19 @@ router.post('/categories/delete', async (req, res) => {
     const id = req.body.id
     if(!id || isNaN(id)) return res.redirect(req.header('Referer'))
 
-    await Category.destroy({ where: { id }  })
+    await Category.destroy({ where: { id } })
+
+    await Article.destroy({ where: { categoryId: id } })
 
     res.redirect('/admin/categories')
 })
 
 
+router.get('/articles', async (req, res) => {
+    res.redirect('/admin/articles/page/0')
+})
 
-router.get('/articles/:page?', async (req, res) => {
+router.get('/articles/page/:page', async (req, res) => {
     const articlesByPage = 4
 
     let page
@@ -63,7 +96,6 @@ router.get('/articles/:page?', async (req, res) => {
     } else {
         page = req.params.page
     }
-
 
     const articles = await Article.findAndCountAll({ 
         include: [{ model: Category }],
@@ -79,11 +111,9 @@ router.get('/articles/:page?', async (req, res) => {
         value = Math.floor(value)
     }
 
+    if(page > value && articles.count > 0) return res.redirect(`/admin/articles/page/${value}`)
 
-    if(page > value) return res.redirect(`/admin/articles/${value}`)
-
-    console.log(page)
-    res.render('admin/articles/articles', { articles, page: { current: page, last: value } })
+    res.render('admin/articles/articles', { articles , page: { current: page, last: value } })
 })
 
 router.get('/articles/new', async (req, res) => {
