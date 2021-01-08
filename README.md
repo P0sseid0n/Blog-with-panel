@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to Blog with panel 👋</h1>
 <p>
-  <a href="https://www.npmjs.com/package/Blog-with-panel" target="_blank">
+  <a href="https://www.npmjs.com/package/blog-with-panel" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/Blog with panel.svg">
   </a>
   <a href="#" target="_blank">
