@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to Blog with panel 👋</h1>
 <p>
-  <a href="https://www.npmjs.com/package/Blog with panel" target="_blank">
+  <a href="https://www.npmjs.com/package/Blog-with-panel" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/Blog with panel.svg">
   </a>
   <a href="#" target="_blank">
@@ -11,7 +11,7 @@
   </a>
 </p>
 
-> This is my project version of the &#34;Formação nodejs&#34; course of Guia do programador.
+> This is my project version of the &#34;Formação Node.js&#34; course of Guia do programador.
 
 ## Install
 
