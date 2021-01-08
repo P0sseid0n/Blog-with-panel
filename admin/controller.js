@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const slugify = require('slugify')
+const bcrypt = require('bcryptjs')
 
 const Category = require('../categories/model')
 const Article = require('../articles/model')
@@ -23,7 +24,10 @@ router.get('/add', async (req, res) => {
 router.post('/add', async (req, res) => {
     const { username, password } = req.body
 
-    await Admin.create({ username, password  })
+    const salt = bcrypt.genSaltSync(10)
+    const hash = bcrypt.hashSync(password, salt)
+
+    await Admin.create({ username, password: hash  })
 
     res.redirect('/admin/list')
 })
@@ -75,9 +79,9 @@ router.post('/categories/delete', async (req, res) => {
     const id = req.body.id
     if(!id || isNaN(id)) return res.redirect(req.header('Referer'))
 
-    await Category.destroy({ where: { id } })
-
     await Article.destroy({ where: { categoryId: id } })
+
+    await Category.destroy({ where: { id } })
 
     res.redirect('/admin/categories')
 })

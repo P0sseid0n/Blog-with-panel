@@ -3,6 +3,8 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const app = express()
 
+const session = require('express-session')
+
 const categoriesCtllr = require('./categories/controller')
 const articlesCtllr = require('./articles/controller')
 const adminCtllr = require('./admin/controller')
@@ -14,6 +16,8 @@ const adminModel = require('./admin/model')
 const connection = require('./database/connection')
 
 app.set('view engine', 'ejs')
+
+app.use(session({ secret: 'secret', cookie: { maxAge: 30_000 } }))
 
 app.use(express.static('public'))
 
